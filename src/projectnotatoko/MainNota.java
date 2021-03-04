@@ -1,50 +1,55 @@
 package projectnotatoko;
 
 // Import Package Scanner, dan Format Mata Uang
+import projectnotatoko.helper.CurrencyFormatter;
+import projectnotatoko.model.Barang;
+import projectnotatoko.model.Pesanan;
+
 import java.util.Scanner;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 
 public class MainNota {
-    
-    static DecimalFormat kursIndonesia = (DecimalFormat) DecimalFormat.getCurrencyInstance();
-    static DecimalFormatSymbols formatRp = new DecimalFormatSymbols();
-    
-    static int inputJumlahData;
-    static int ulang = 1, inputBarang, inputQty;
-    
-    static int[] harga = {5000, 3000, 4000, 10000, 5000, 8000, 15000, 2000};
     static Scanner input = new Scanner(System.in);
     
-//    static int[] kode = {1,2,3,4,5,6,7,8};
-//    static int[] barang = new int[9];
-//    static int[] quantity = new int[9];
-    
-    public static void main(String[] args) {
-        
+    public static void main(String[] args) throws Exception {
+        Barang susu = new Barang("Susu", 5000);
+        Barang kopi = new Barang("Kopi", 3000);
+        Barang teh = new Barang("Teh", 4000);
+        Barang jus = new Barang("Jus", 10000);
+        Barang sosis = new Barang("Sosis", 5000);
+        Barang mieInstant = new Barang("Mie Instant", 8000);
+        Barang nasiGoreng = new Barang("Nasi Goreng", 15000);
+        Barang kerupuk = new Barang("Kerupuk", 2000);
+
+        Barang[] listBarang = new Barang[]{
+                susu,
+                kopi,
+                teh,
+                jus,
+                sosis,
+                mieInstant,
+                nasiGoreng,
+                kerupuk,
+        };
+
         header();
-        informasiBarang();
-        input();
+        informasiBarang(listBarang);
+        Pesanan[] daftarPesanan = prosesBelanja(listBarang);
+
+        jumlahHarga(daftarPesanan);
     }
     
-    public static void informasiBarang(){
-        formatRp.setCurrencySymbol("Rp. ");
-//        formatRp.setMonetaryDecimalSeparator(',');
-        formatRp.setGroupingSeparator('.');
-
-        kursIndonesia.setDecimalFormatSymbols(formatRp);
-        
+    public static void informasiBarang(Barang[] listBarang){
         System.out.println("Kode Barang   ||  Harga Barang");
-        System.out.println("1. Susu       ||  " + kursIndonesia.format(harga[0]));
-        System.out.println("2. Kopi       ||  " + kursIndonesia.format(harga[1]));
-        System.out.println("3. Teh        ||  " + kursIndonesia.format(harga[2]));
-        System.out.println("4. Jus        ||  " + kursIndonesia.format(harga[3]));
-        System.out.println("5. Sosis      ||  " + kursIndonesia.format(harga[4]));
-        System.out.println("6. Mie Instan ||  " + kursIndonesia.format(harga[5]));
-        System.out.println("7. Nasi Goreng||  " + kursIndonesia.format(harga[6]));
-        System.out.println("8. Kerupuk    ||  " + kursIndonesia.format(harga[7]));
+
+        int index = 1;
+        int c = 11;
+        for (Barang barang: listBarang) {
+            System.out.printf("%d. %-" + c + "s||  %s%n", index, barang.getNama(), CurrencyFormatter.format(barang.getHarga()));
+            index++;
+        }
         System.out.println("------------------------------");
-        
     }
     
     public static void header(){
@@ -57,100 +62,43 @@ public class MainNota {
         
     }
     
-    public static void input(){
-        
+    public static Pesanan[] prosesBelanja(Barang[] listBarang) throws Exception {
         System.out.print("Masukkan Jumlah Barang : ");
-        inputJumlahData = input.nextInt();
+        int jumlahData = input.nextInt();
         System.out.println();
-        
-        while(ulang <= inputJumlahData){
-            
-            System.out.print("Masukkan Kode Barang ke-" + ulang + "     : ");
-            inputBarang = input.nextInt();
-            System.out.print("Masukkan Quantity Barang ke-" + ulang + " : ");
-            inputQty = input.nextInt();
-            
-            ulang++;
+        Pesanan[] orders = new Pesanan[jumlahData];
+
+        for (int i = 1; i <= jumlahData; i++) {
+            System.out.printf("Masukkan Kode Barang ke-%d     : ", i);
+            int inputBarang = input.nextInt();
+            System.out.printf("Masukkan Quantity Barang ke-%d : ", i);
+            int inputQty = input.nextInt();
             System.out.println("------------------------------");
-            keteranganBarang();
-            hargaBarang();
-            System.out.println();
-        }
-        
-    }
-    
-    public static void keteranganBarang(){      
-        
-        switch(inputBarang){
-            case 1:
-                System.out.print("Susu ");
-                break;
-            case 2:
-                System.out.print("Kopi ");
-                break;
-            case 3:
-                System.out.print("Teh ");
-                break;
-            case 4:
-                System.out.print("Jus ");
-                break;
-            case 5:
-                System.out.print("Sosis ");
-                break;
-            case 6:
-                System.out.print("Mie Instan ");
-                break;
-            case 7:
-                System.out.print("Nasi Goreng ");
-                break;
-            case 8:
-                System.out.print("Kerupuk ");
-                break;
-            default:
-                System.out.print("Kode Tidak Sesuai ");
-                break;
-        }
-    }
-    
-    public static void hargaBarang(){
-        formatRp.setCurrencySymbol("Rp. ");
-        formatRp.setMonetaryDecimalSeparator(',');
-        formatRp.setGroupingSeparator('.');
 
-        kursIndonesia.setDecimalFormatSymbols(formatRp);
+            if (i < 1 || listBarang.length + 1 < i) {
+                throw new Exception("Ga ada barangnya");
+            }
 
-        switch(inputBarang){
-            case 1:
-                System.out.println((kursIndonesia.format(harga[0]) + " x " + inputQty) + " = " + kursIndonesia.format(harga[0]*inputQty));
-                break;
-            case 2:
-                System.out.println((kursIndonesia.format(harga[1]) + " x " + inputQty) + " = " + kursIndonesia.format(harga[1]*inputQty));
-                break;
-            case 3:
-                System.out.println((kursIndonesia.format(harga[2]) + " x " + inputQty) + " = " + kursIndonesia.format(harga[2]*inputQty));
-                break;
-            case 4:
-                System.out.println((kursIndonesia.format(harga[3]) + " x " + inputQty) + " = " + kursIndonesia.format(harga[3]*inputQty));
-                break;
-            case 5:
-                System.out.println((kursIndonesia.format(harga[4]) + " x " + inputQty) + " = " + kursIndonesia.format(harga[4]*inputQty));
-                break;
-            case 6:
-                System.out.println((kursIndonesia.format(harga[5]) + " x " + inputQty) + " = " + kursIndonesia.format(harga[5]*inputQty));
-                break;
-            case 7:
-                System.out.println((kursIndonesia.format(harga[6]) + " x " + inputQty) + " = " + kursIndonesia.format(harga[6]*inputQty));
-                break;
-            case 8:
-                System.out.println((kursIndonesia.format(harga[7]) + " x " + inputQty) + " = " + kursIndonesia.format(harga[7]*inputQty));
-                break;
-            default:
-                System.out.print("Kode Tidak Sesuai ");
-                break;
+            Barang barangPilihan = listBarang[inputBarang - 1];
+            Pesanan order = new Pesanan(barangPilihan, inputQty);
+            orders[i - 1] = order;
+            System.out.printf(
+                    "%s %s x %d = %s%n",
+                    barangPilihan.getNama(),
+                    CurrencyFormatter.format(barangPilihan.getHarga()),
+                    order.getKuantitas(),
+                    CurrencyFormatter.format(barangPilihan.getHarga() * order.getKuantitas())
+            );
         }
+        return orders;
     }
-    
-    public static void jumlahHarga(){
-        
+
+    public static void jumlahHarga(Pesanan[] daftarPesanan) {
+        int yangDibayar = 0;
+        for (Pesanan pesanan: daftarPesanan) {
+            yangDibayar += pesanan.getJumlahBayar();
+        }
+
+        System.out.printf("Yang dibayar sebesar: %s%n", CurrencyFormatter.format(yangDibayar));
     }
 }
